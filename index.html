@@ -13,7 +13,7 @@
     /* API 키 입력 영역 */
     .key-section { background: #212529; color: #fff; padding: 10px 12px; display: flex; gap: 6px; align-items: center; font-size: 12px; }
     .key-section input { flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid #495057; background: #343a40; color: #fff; font-size: 12px; outline: none; }
-    .key-section button { background: #ffeb33; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; }
+    .key-section button { background: #ffeb33; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; color: #000; }
 
     .chat-container { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
     .msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; white-space: pre-wrap; }
@@ -21,11 +21,11 @@
     .user { align-self: flex-end; background: #ffeb33; color: #000; border-top-right-radius: 2px; }
     
     .quick-btns { display: flex; gap: 6px; padding: 8px 12px; background: #abc0d0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .quick-btn { background: #ffffff; border: 1px solid #ced4da; border-radius: 16px; padding: 6px 12px; font-size: 12px; white-space: nowrap; cursor: pointer; flex-shrink: 0; }
+    .quick-btn { background: #ffffff; border: 1px solid #ced4da; border-radius: 16px; padding: 6px 12px; font-size: 12px; white-space: nowrap; cursor: pointer; flex-shrink: 0; color: #000; }
     
     .input-area { display: flex; padding: 10px; background: #ffffff; gap: 8px; border-top: 1px solid #ddd; }
     .input-area input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 14px; font-size: 14px; outline: none; }
-    .input-area button { background: #ffeb33; border: none; border-radius: 50%; width: 38px; height: 38px; font-weight: bold; cursor: pointer; }
+    .input-area button { background: #ffeb33; border: none; border-radius: 50%; width: 38px; height: 38px; font-weight: bold; cursor: pointer; color: #000; }
     .loading { color: #666; font-style: italic; }
   </style>
 </head>
@@ -33,15 +33,15 @@
 <div class="app">
   <div class="header">삼영보영 취업규칙 AI 도우미</div>
   
-  <!-- 화면 상단 API 키 입력바 -->
+  <!-- 상단 API 키 입력바 -->
   <div class="key-section">
     <span>🔑 API Key:</span>
-    <input type="password" id="apiKeyInput" placeholder="AIzaSyDf5_C6FlqT3DWp0X_IWcsM1xBfY8rXVSo">
+    <input type="password" id="apiKeyInput" placeholder="Gemini API 키를 여기에 입력하세요">
     <button onclick="saveKey()">저장</button>
   </div>
 
   <div class="chat-container" id="chat">
-    <div class="msg bot">안녕하세요! 삼영보영 취업규칙 AI 도우미입니다. 상단에 Gemini API 키를 입력/저장하신 후 질문을 등록해 주세요.</div>
+    <div class="msg bot">안녕하세요! 삼영보영 취업규칙 AI 도우미입니다. 상단에 Gemini API 키를 입력 및 저장하신 후 질문을 등록해 주세요.</div>
   </div>
   
   <div class="quick-btns">
@@ -57,7 +57,7 @@
 </div>
 
 <script>
-  // 로컬 스토리지에서 저장된 키 불러오기
+  // 저장된 API 키 불러오기
   window.onload = function() {
     const savedKey = localStorage.getItem('gemini_api_key');
     if (savedKey) {
@@ -75,9 +75,9 @@
     alert("API 키가 브라우저에 저장되었습니다.");
   }
 
-  // 취업규칙 데이터 텍스트
+  // 삼영보영 취업규칙 데이터
   const RULE_TEXT = `
-  삼영운수 주식회사 취업규칙 (2026. 07. 01. 개정)
+  삼영운수 주식회사 취업규칙
   제14조(근무시간 및 근무제도) 운전직: 1일 2교대 월 22일 근무제 원칙 / 정비직: 월 26일 주간 근무제 / 배차직: 2주 단위 탄력적 근로시간제.
   제15조(휴게시간) 4시간 근로에 30분, 8시간 근로에 60분 이상 부여.
   제20조(연차 유급 휴가) 1년간 80% 이상 출근 시 15일 부여. 1년 미만 또는 80% 미만 출근 시 1개월 개근 시 1일 부여. 사용 5일 전 서면 신청.
@@ -105,19 +105,20 @@
     try {
       const systemPrompt = `
 너는 삼영보영 사원 전용 '취업규칙 안내 챗봇'이야.
-제시된 [삼영보영 취업규칙 요약] 내용을 바탕으로 직원의 질문에 정확히 답변해.
+제시된 [삼영보영 취업규칙 내용]을 바탕으로 직원의 질문에 정확히 답변해.
 
 [답변 규칙]
-1. 반드시 규정 내용에만 기초하여 답변할 것.
+1. 반드시 규칙 내용에 명시된 사실에만 기초하여 답변할 것.
 2. 모바일 화면용으로 3~4줄 이내로 핵심만 간결하게 작성할 것.
 3. 관련 조항(예: 📌 관련 조항: 제20조)을 함께 표기할 것.
-4. 규칙 외 내용이나 개인별 데이터는 인사/노무 담당자 문의로 안내할 것.
+4. 규칙 외 내용이나 개인 데이터는 인사/노무 담당자 문의로 안내할 것.
 
 [취업규칙 내용]
 ${RULE_TEXT}
       `;
 
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+      // gemini-1.5-flash 모델 적용
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -129,16 +130,19 @@ ${RULE_TEXT}
       const data = await response.json();
       removeMessage(loadingId);
 
-      if (data.candidates && data.candidates[0].content.parts[0].text) {
+      if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
         let reply = data.candidates[0].content.parts[0].text;
         reply = reply.replace(/\n/g, '<br>');
         addMessage(reply, 'bot');
+      } else if (data.error) {
+        // 상세 에러 메시지 출력
+        addMessage(`⚠️ 오류 발생 (${data.error.code}): ${data.error.message}`, 'bot');
       } else {
-        addMessage("답변 생성 실패: API 키가 올바른지 확인해 주세요.", 'bot');
+        addMessage("답변 응답 형식이 올바르지 않습니다.", 'bot');
       }
     } catch (error) {
       removeMessage(loadingId);
-      addMessage("오류 발생: " + error.message, 'bot');
+      addMessage("네트워크 오류 발생: " + error.message, 'bot');
     }
   }
 
