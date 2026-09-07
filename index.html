@@ -1,199 +1,215 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>삼영보영 취업규칙 AI 도우미</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #8fa1b0; }
-    .app { display: flex; flex-direction: column; height: 100vh; max-width: 500px; margin: 0 auto; background: #abc0d0; }
-    
-    .header { background: #343a40; color: #fff; padding: 14px; text-align: center; font-weight: bold; font-size: 16px; position: relative; }
-    .key-toggle-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #aaa; cursor: pointer; font-size: 14px; }
-    
-    .key-section { background: #212529; color: #fff; padding: 10px 12px; display: flex; gap: 6px; align-items: center; font-size: 12px; transition: all 0.3s ease; }
-    .key-section.hidden { display: none; } /* 키 저장 완료 시 숨김 처리 */
-    .key-section input { flex: 1; padding: 6px 10px; border-radius: 4px; border: 1px solid #495057; background: #343a40; color: #fff; font-size: 12px; outline: none; }
-    .key-section button { background: #ffeb33; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 11px; color: #000; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>삼영운수 스마트 취업규칙 챗봇</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        :root {
+            --primary: #1e40af;
+            --bg: #f8fafc;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-sub: #64748b;
+            --border: #cbd5e1;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+        }
 
-    .chat-container { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-    .msg { max-width: 85%; padding: 10px 14px; border-radius: 14px; font-size: 14px; line-height: 1.5; word-break: break-word; white-space: pre-wrap; }
-    .bot { align-self: flex-start; background: #ffffff; color: #000; border-top-left-radius: 2px; }
-    .user { align-self: flex-end; background: #ffeb33; color: #000; border-top-right-radius: 2px; }
-    
-    .quick-btns { display: flex; gap: 6px; padding: 8px 12px; background: #abc0d0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .quick-btn { background: #ffffff; border: 1px solid #ced4da; border-radius: 16px; padding: 6px 12px; font-size: 12px; white-space: nowrap; cursor: pointer; flex-shrink: 0; color: #000; }
-    
-    .input-area { display: flex; padding: 10px; background: #ffffff; gap: 8px; border-top: 1px solid #ddd; }
-    .input-area input { flex: 1; border: 1px solid #ddd; border-radius: 20px; padding: 10px 14px; font-size: 14px; outline: none; }
-    .input-area button { background: #ffeb33; border: none; border-radius: 50%; width: 38px; height: 38px; font-weight: bold; cursor: pointer; color: #000; }
-    .loading { color: #666; font-style: italic; }
-  </style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Pretendard Variable", sans-serif; background: var(--bg); color: var(--text); padding: 16px; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .site-title { font-size: 18px; font-weight: 800; color: #1e3a8a; }
+        .version-badge { background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+
+        /* 검색/질문 입력창 영역 */
+        .search-box { background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .input-group { display: flex; gap: 8px; }
+        .search-input { flex: 1; padding: 12px; font-size: 15px; border: 1.5px solid var(--border); border-radius: 8px; outline: none; }
+        .search-input:focus { border-color: var(--primary); }
+        .btn-search { background: var(--primary); color: #fff; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* 상태 표시 영역 (로딩/에러 방지 메세지) */
+        .status-msg { font-size: 13px; color: var(--text-sub); margin-top: 8px; display: none; }
+
+        /* 🎴 카드뷰 디자인 */
+        .card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .badge { background: #dbeafe; color: var(--primary); font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; }
+        .card-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+        
+        .card-summary { background: #f1f5f9; padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary); font-size: 14px; margin-bottom: 14px; line-height: 1.5; }
+        .card-summary.danger { border-left-color: var(--danger); background: var(--danger-bg); }
+
+        .rule-list { display: flex; flex-direction: column; gap: 10px; border-top: 1px dashed var(--border); padding-top: 12px; }
+        .rule-item { font-size: 13.5px; color: #334155; }
+        .rule-item strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
+
+        .no-result { text-align: center; padding: 40px 20px; background: var(--surface); border-radius: 12px; color: var(--text-sub); font-size: 14px; border: 1px solid var(--border); }
+    </style>
 </head>
 <body>
-<div class="app">
-  <div class="header">
-    삼영보영 취업규칙 AI 도우미
-    <!-- 오른쪽 상단 ⚙️ 아이콘 클릭 시 API 키 설정창 열기/닫기 -->
-    <button class="key-toggle-btn" onclick="toggleKeySection()" title="API Key 설정">⚙️</button>
-  </div>
-  
-  <div class="key-section" id="keySection">
-    <span>🔑 API Key:</span>
-    <input type="password" id="apiKeyInput" placeholder="Gemini API 키를 입력해 주세요">
-    <button onclick="saveKey()">저장</button>
-  </div>
 
-  <div class="chat-container" id="chat">
-    <div class="msg bot" id="welcomeMsg">안녕하세요! 삼영보영 취업규칙 AI 도우미입니다. 질문을 입력해주시면 바로 답변해 드립니다.</div>
-  </div>
-  
-  <div class="quick-btns">
-    <button class="quick-btn" onclick="send('연차 유급 휴가 규정에 대해 알려줘')">연차 휴가</button>
-    <button class="quick-btn" onclick="send('본인 결혼 시 경조휴가는 며칠인가요?')">경조 휴가</button>
-    <button class="quick-btn" onclick="send('음주운전 적발 시 징계 기준이 어떻게 되나요?')">음주운전 징계</button>
-  </div>
-  
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="취업규칙에 대해 질문하세요..." onkeypress="if(event.keyCode==13) send()">
-    <button onclick="send()">➔</button>
-  </div>
+<div class="container">
+    <div class="header">
+        <h1 class="site-title">🚌 삼영운수 취업규칙 챗봇</h1>
+        <span class="version-badge">시행일: 2026.07.01</span>
+    </div>
+
+    <div class="search-box">
+        <div class="input-group">
+            <input type="text" id="user-input" class="search-input" placeholder="궁금한 내용을 물어보세요 (예: 음주운전, 연차, 정년)..." onkeyup="if(event.keyCode===13) handleSearch()">
+            <button class="btn-search" onclick="handleSearch()">질문</button>
+        </div>
+        <div id="status-msg" class="status-msg"></div>
+    </div>
+
+    <!-- 결과 카드가 출력되는 영역 -->
+    <div id="result-container"></div>
 </div>
 
 <script>
-  window.onload = function() {
-    const savedKey = localStorage.getItem('gemini_api_key');
-    const keySection = document.getElementById('keySection');
-    const welcomeMsg = document.getElementById('welcomeMsg');
-
-    if (savedKey) {
-      document.getElementById('apiKeyInput').value = savedKey;
-      // 키가 이미 저장되어 있으면 상단 입력창을 보이지 않게 숨김
-      keySection.classList.add('hidden');
-    } else {
-      welcomeMsg.innerHTML = "안녕하세요! 삼영보영 취업규칙 AI 도우미입니다.<br>상단에 Gemini API 키를 등록 및 저장하신 후 질문해 주세요.";
-    }
-  };
-
-  function saveKey() {
-    const key = document.getElementById('apiKeyInput').value.trim();
-    if (!key) {
-      alert("API 키를 입력해 주세요.");
-      return;
-    }
-    localStorage.setItem('gemini_api_key', key);
-    alert("API 키가 저장되었습니다.");
-    // 저장 후 상단 키 입력창 숨김 처리
-    document.getElementById('keySection').classList.add('hidden');
-  }
-
-  // ⚙️ 버튼을 누르면 API 키 입력창을 켜고 끌 수 있는 기능
-  function toggleKeySection() {
-    const keySection = document.getElementById('keySection');
-    keySection.classList.toggle('hidden');
-  }
-
-  const RULE_TEXT = `
-  삼영운수 주식회사 취업규칙
-  제14조(근무시간 및 근무제도) 운전직: 1일 2교대 월 22일 근무제 원칙 / 정비직: 월 26일 주간 근무제 / 배차직: 2주 단위 탄력적 근로시간제.
-  제15조(휴게시간) 4시간 근로에 30분, 8시간 근로에 60분 이상 부여.
-  제20조(연차 유급 휴가) 1년간 80% 이상 출근 시 15일 부여. 1년 미만 또는 80% 미만 출근 시 1개월 개근 시 1일 부여. 사용 5일 전 서면 신청.
-  제32조(경조휴가) 본인 결혼 5일(유급), 자녀 결혼 1일(유급), 부모 사망 5일(유급), 배우자 사망 5일(유급), 처부모 사망 5일(유급), 조부모 사망 2일 중 1일(유급), 자녀 사망 5일(유급). 3일 전 신청.
-  제38조(정년퇴직) 운전직·정비직: 만 65세 / 그 밖의 사원: 만 60세.
-  제51조~제53조(징계사유) 음주측정 1회/0.03%미만 감봉, 2회/0.03%~0.08%미만 출근정지, 측정거부/3회/0.08%이상 징계해고.
-  `;
-
- async function send(text) {
-    const key = localStorage.getItem('gemini_api_key') || document.getElementById('apiKeyInput').value.trim();
-    if (!key) {
-      alert("Gemini API 키가 설정되지 않았습니다. 상단 ⚙️ 버튼을 눌러 API 키를 저장해 주세요!");
-      document.getElementById('keySection').classList.remove('hidden');
-      return;
-    }
-
-    const input = document.getElementById('userInput');
-    const query = text || input.value.trim();
-    if (!query) return;
-
-    addMessage(query, 'user');
-    if (!text) input.value = '';
-
-    const loadingId = addMessage("AI가 취업규칙을 분석하는 중입니다...", 'bot loading');
-
-    const systemPrompt = `
-너는 삼영보영 사원 전용 '취업규칙 안내 챗봇'이야.
-제시된 [삼영보영 취업규칙 내용]을 바탕으로 직원의 질문에 정확히 답변해.
-
-[답변 규칙]
-1. 반드시 규칙 내용에 명시된 사실에만 기초하여 답변할 것.
-2. 모바일 화면용으로 3~4줄 이내로 핵심만 간결하게 작성할 것.
-3. 관련 조항(예: 📌 관련 조항: 제20조)을 함께 표기할 것.
-4. 규칙 외 내용이나 개인 데이터는 인사/노무 담당자 문의로 안내할 것.
-
-[취업규칙 내용]
-${RULE_TEXT}
-    `;
-
-    try {
-      let response;
-      let data;
-      const maxRetries = 3;
-      
-      // 503 과부하 발생 시 최대 3회 자동 재시도
-      for (let i = 0; i < maxRetries; i++) {
-        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${key}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: systemPrompt + "\n\n질문: " + query }] }],
-            generationConfig: { temperature: 0.1, maxOutputTokens: 800 }
-          })
-        });
-
-        data = await response.json();
-
-        // 503(서버 과부하) 발생 시 1.5초 후 자동 재시도
-        if (response.status === 503 && i < maxRetries - 1) {
-          await new Promise(res => setTimeout(res, 1500));
-          continue;
+    // 1. 안전하게 로컬에서 즉시 검색 가능한 데이터베이스 (API 네트워크 에러 원천 차단)
+    const knowledgeBase = [
+        {
+            category: "복무 & 징계",
+            title: "음주운전 및 측정 거부 징계 기준",
+            keywords: ["음주", "술", "숙취", "측정", "음주운전", "음주측정"],
+            isDanger: true,
+            summary: "음주운전 및 측정 거부는 중대 위반 사항으로, 수치와 적발 횟수에 따라 감봉, 승무정지, 징계해고에 처해집니다.",
+            rules: [
+                { title: "제7조 (복무규율)", content: "음주 및 숙취 상태 운전 금지 및 회사의 음주 측정 응시 의무" },
+                { title: "제51조 (감봉사유)", content: "음주측정 결과 0.03% 미만 또는 1회 적발 시 감봉" },
+                { title: "제52조 (승무정지)", content: "0.03% 이상~0.08% 미만 또는 2회 적발 시 승무정지" },
+                { title: "제53조 (징계해고)", content: "0.08% 이상, 3회 적발, 또는 음주측정 거부 시 징계해고" }
+            ]
+        },
+        {
+            category: "근무시간 & 휴가",
+            title: "연차 유급 휴가 규정",
+            keywords: ["연차", "휴가", "월차", "쉬는날", "연차유급휴가"],
+            isDanger: false,
+            summary: "1년간 80% 이상 출근 시 15일의 연차유급휴가가 부여되며, 5일 전 서면 신청이 필요합니다.",
+            rules: [
+                { title: "제20조 제1항", content: "1년간 80퍼센트 이상 출근한 사원에게 15일의 연차유급휴가 부여" },
+                { title: "제20조 제2항", content: "1년 미만 근로자 또는 80% 미만 출근자는 1개월 개근 시 1일 부여" },
+                { title: "제20조 제3항", content: "연차 유급 휴가는 사용 5일 전 서면으로 신청하여 회사 승인 수령" }
+            ]
+        },
+        {
+            category: "복리후생",
+            title: "경조휴가 지급 기준",
+            keywords: ["경조사", "결혼", "사망", "장례", "경조휴가", "화환"],
+            isDanger: false,
+            summary: "본인 및 가족의 경조사 발생 시 유형별 유급 휴가가 부여됩니다.",
+            rules: [
+                { title: "본인 결혼", content: "5일 유급휴가" },
+                { title: "자녀 결혼", content: "1일 유급휴가" },
+                { title: "부모 / 배우자 / 자녀 사망", content: "5일 유급휴가" },
+                { title: "조부모 사망", content: "2일 중 1일 유급휴가" }
+            ]
+        },
+        {
+            category: "퇴직 & 정년",
+            title: "직종별 정년퇴직 기준",
+            keywords: ["정년", "퇴직", "나이", "촉탁", "임시직"],
+            isDanger: false,
+            summary: "운전직·정비직은 만 65세, 기타 사원은 만 60세가 정년입니다.",
+            rules: [
+                { title: "제38조 제1항", content: "운전직·정비직 사원 정년: 만 65세" },
+                { title: "제38조 제2항", content: "그 밖의 사원(관리직 등) 정년: 만 60세" },
+                { title: "제38조 제3항", content: "정년에 달한 월의 말일 퇴직. 필요시 촉탁사원 재고용 가능" }
+            ]
         }
-        break;
-      }
+    ];
 
-      removeMessage(loadingId);
+    // 2. 검색 및 안전 처리 로직 (API 에러 방지)
+    function handleSearch() {
+        const inputEl = document.getElementById('user-input');
+        const query = inputEl.value.trim().toLowerCase();
+        const container = document.getElementById('result-container');
+        const statusEl = document.getElementById('status-msg');
 
-      if (data && data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-        let reply = data.candidates[0].content.parts[0].text;
-        reply = reply.replace(/\n/g, '<br>');
-        addMessage(reply, 'bot');
-      } else if (data && data.error) {
-        addMessage(`⚠️ 오류 발생 (${data.error.code}): ${data.error.message}`, 'bot');
-      } else {
-        addMessage("답변 응답 형식이 올바르지 않습니다.", 'bot');
-      }
-    } catch (error) {
-      removeMessage(loadingId);
-      addMessage("네트워크 오류 발생: " + error.message, 'bot');
+        if (!query) {
+            alert('검색어나 질문을 입력해 주세요.');
+            return;
+        }
+
+        // 로딩 및 상태 표시 (에러 발생 가능성 차단)
+        statusEl.style.display = 'block';
+        statusEl.innerText = '취업규칙 데이터를 조회 중입니다...';
+
+        try {
+            // 키워드 검색 수행
+            const results = knowledgeBase.filter(item => {
+                return item.title.toLowerCase().includes(query) ||
+                       item.summary.toLowerCase().includes(query) ||
+                       item.keywords.some(kw => kw.toLowerCase().includes(query));
+            });
+
+            setTimeout(() => { // 처리감을 주기 위한 미세 지연
+                statusEl.style.display = 'none';
+                renderCards(results, container);
+            }, 200);
+
+        } catch (error) {
+            // 외부 API 통신 실패 시에도 앱이 튕기지 않도록 예외 처리
+            console.error('검색 중 오류 발생:', error);
+            statusEl.style.color = 'var(--danger)';
+            statusEl.innerText = '데이터를 불러오는 중 오류가 발생했습니다. 다시 시도해 주세요.';
+        }
     }
-  }
 
-  function addMessage(text, className) {
-    const chat = document.getElementById('chat');
-    const msgDiv = document.createElement('div');
-    const id = 'msg-' + Date.now();
-    msgDiv.id = id;
-    msgDiv.className = `msg ${className}`;
-    msgDiv.innerHTML = text;
-    chat.appendChild(msgDiv);
-    chat.scrollTop = chat.scrollHeight;
-    return id;
-  }
+    // 3. 카드뷰 UI 렌더링 함수
+    function renderCards(dataList, container) {
+        container.innerHTML = '';
 
-  function removeMessage(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
-  }
+        if (dataList.length === 0) {
+            container.innerHTML = `
+                <div class="no-result">
+                    🔍 입력하신 단어에 해당하는 취업규칙 항목을 찾을 수 없습니다.<br>
+                    <strong>'음주', '연차', '경조사', '정년'</strong> 등의 키워드로 검색해 보세요.
+                </div>
+            `;
+            return;
+        }
+
+        dataList.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'card';
+
+            const rulesHtml = item.rules.map(r => `
+                <div class="rule-item">
+                    <strong>📌 ${r.title}</strong>
+                    ${r.content}
+                </div>
+            `).join('');
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <span class="badge">${item.category}</span>
+                </div>
+                <h3 class="card-title">${item.title}</h3>
+                <div class="card-summary ${item.isDanger ? 'danger' : ''}">
+                    <strong>💡 핵심 요약:</strong> ${item.summary}
+                </div>
+                <div class="rule-list">
+                    ${rulesHtml}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // 초기 화면 실행
+    window.onload = function() {
+        // 기본값으로 전체 규칙 안내 표시
+        renderCards(knowledgeBase, document.getElementById('result-container'));
+    };
 </script>
+
 </body>
 </html>
