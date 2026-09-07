@@ -119,7 +119,7 @@ ${RULE_TEXT}
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: systemPrompt + "\n\n질문: " + query }] }],
-          generationConfig: { temperature: 0.1 }
+          generationConfig: { temperature: 0.1, maxOutputTokens: 800 }
         })
       });
 
