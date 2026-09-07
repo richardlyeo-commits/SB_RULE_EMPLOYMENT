@@ -19,34 +19,38 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Pretendard Variable", sans-serif; background: var(--bg); color: var(--text); padding: 16px; line-height: 1.6; }
-        .container { max-width: 600px; margin: 0 auto; }
+        .container { max-width: 650px; margin: 0 auto; }
 
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
         .site-title { font-size: 18px; font-weight: 800; color: #1e3a8a; }
         .version-badge { background: #dbeafe; color: #1e40af; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
 
-        /* 검색/질문 입력창 영역 */
-        .search-box { background: var(--surface); padding: 12px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        /* 검색 영역 */
+        .search-box { background: var(--surface); padding: 14px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
         .input-group { display: flex; gap: 8px; }
         .search-input { flex: 1; padding: 12px; font-size: 15px; border: 1.5px solid var(--border); border-radius: 8px; outline: none; }
         .search-input:focus { border-color: var(--primary); }
-        .btn-search { background: var(--primary); color: #fff; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-search { background: var(--primary); color: #fff; border: none; padding: 0 18px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* 상태 표시 영역 (로딩/에러 방지 메세지) */
+        /* 빠른 키워드 태그 */
+        .quick-tags { display: flex; gap: 6px; margin-top: 10px; overflow-x: auto; padding-bottom: 4px; }
+        .tag-chip { background: #f1f5f9; border: 1px solid var(--border); color: var(--text-sub); font-size: 12px; padding: 4px 10px; border-radius: 12px; cursor: pointer; white-space: nowrap; }
+        .tag-chip:hover { background: #e2e8f0; color: var(--text); }
+
         .status-msg { font-size: 13px; color: var(--text-sub); margin-top: 8px; display: none; }
 
-        /* 🎴 카드뷰 디자인 */
-        .card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        /* 🎴 상세 카드뷰 */
+        .card { background: var(--surface); border-radius: 16px; border: 1px solid var(--border); padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .badge { background: #dbeafe; color: var(--primary); font-size: 12px; font-weight: 700; padding: 4px 8px; border-radius: 6px; }
-        .card-title { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
+        .card-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 12px; }
         
-        .card-summary { background: #f1f5f9; padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary); font-size: 14px; margin-bottom: 14px; line-height: 1.5; }
+        .card-summary { background: #f1f5f9; padding: 12px 14px; border-radius: 8px; border-left: 4px solid var(--primary); font-size: 14px; margin-bottom: 14px; line-height: 1.6; }
         .card-summary.danger { border-left-color: var(--danger); background: var(--danger-bg); }
 
-        .rule-list { display: flex; flex-direction: column; gap: 10px; border-top: 1px dashed var(--border); padding-top: 12px; }
-        .rule-item { font-size: 13.5px; color: #334155; }
-        .rule-item strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
+        .rule-list { display: flex; flex-direction: column; gap: 12px; border-top: 1px dashed var(--border); padding-top: 14px; }
+        .rule-item { font-size: 14px; color: #334155; }
+        .rule-item strong { display: block; color: var(--text); font-size: 14.5px; margin-bottom: 3px; }
 
         .no-result { text-align: center; padding: 40px 20px; background: var(--surface); border-radius: 12px; color: var(--text-sub); font-size: 14px; border: 1px solid var(--border); }
     </style>
@@ -56,77 +60,128 @@
 <div class="container">
     <div class="header">
         <h1 class="site-title">🚌 삼영운수 취업규칙 챗봇</h1>
-        <span class="version-badge">시행일: 2026.07.01</span>
+        <span class="version-badge">개정: 2026.07.01</span>
     </div>
 
     <div class="search-box">
         <div class="input-group">
-            <input type="text" id="user-input" class="search-input" placeholder="궁금한 내용을 물어보세요 (예: 음주운전, 연차, 정년)..." onkeyup="if(event.keyCode===13) handleSearch()">
-            <button class="btn-search" onclick="handleSearch()">질문</button>
+            <input type="text" id="user-input" class="search-input" placeholder="궁금한 내용을 물어보세요 (예: 음주운전, 육아휴직, 수습)..." onkeyup="if(event.keyCode===13) handleSearch()">
+            <button class="btn-search" onclick="handleSearch()">검색</button>
+        </div>
+        <div class="quick-tags">
+            <span class="tag-chip" onclick="quickSearch('음주')">🚨 음주운전</span>
+            <span class="tag-chip" onclick="quickSearch('연차')">🏖️ 연차휴가</span>
+            <span class="tag-chip" onclick="quickSearch('육아')">👶 육아휴직</span>
+            <span class="tag-chip" onclick="quickSearch('경조사')">🎉 경조휴가</span>
+            <span class="tag-chip" onclick="quickSearch('정년')">⏰ 정년퇴직</span>
+            <span class="tag-chip" onclick="quickSearch('수습')">📝 수습기간</span>
         </div>
         <div id="status-msg" class="status-msg"></div>
     </div>
 
-    <!-- 결과 카드가 출력되는 영역 -->
     <div id="result-container"></div>
 </div>
 
 <script>
-    // 1. 안전하게 로컬에서 즉시 검색 가능한 데이터베이스 (API 네트워크 에러 원천 차단)
+    // 상세 취업규칙 데이터베이스 (전문 내용 반영)
     const knowledgeBase = [
         {
-            category: "복무 & 징계",
-            title: "음주운전 및 측정 거부 징계 기준",
-            keywords: ["음주", "술", "숙취", "측정", "음주운전", "음주측정"],
-            isDanger: true,
-            summary: "음주운전 및 측정 거부는 중대 위반 사항으로, 수치와 적발 횟수에 따라 감봉, 승무정지, 징계해고에 처해집니다.",
+            category: "채용 & 수습",
+            title: "수습 및 시용기간 규정",
+            keywords: ["수습", "시용", "채용", "입사", "3개월", "수습기간", "지각", "사고"],
+            isDanger: false,
+            summary: "신규 채용 사원은 3개월간의 수습기간을 거치며, 무단결근이나 교통사고 발생 시 정규 채용이 거부될 수 있습니다.",
             rules: [
-                { title: "제7조 (복무규율)", content: "음주 및 숙취 상태 운전 금지 및 회사의 음주 측정 응시 의무" },
-                { title: "제51조 (감봉사유)", content: "음주측정 결과 0.03% 미만 또는 1회 적발 시 감봉" },
-                { title: "제52조 (승무정지)", content: "0.03% 이상~0.08% 미만 또는 2회 적발 시 승무정지" },
-                { title: "제53조 (징계해고)", content: "0.08% 이상, 3회 적발, 또는 음주측정 거부 시 징계해고" }
+                { title: "제5조 (수습 및 시용기간)", content: "1. 신규 채용 사원은 채용된 날로부터 3개월간을 수습기간으로 한다." },
+                { title: "수습 평가 및 채용 거부 조건", content: "2. 수습기간 중 업무 성적이 불량하거나, 무단결근 1회 이상, 지각 2회 이상, 또는 교통사고를 발생시킨 자는 정규직 채용을 하지 아니할 수 있다." },
+                { title: "제6조 (근로계약 기간)", content: "근로계약 기간은 1년 단위로 연장 체결한다." }
             ]
         },
         {
-            category: "근무시간 & 휴가",
-            title: "연차 유급 휴가 규정",
-            keywords: ["연차", "휴가", "월차", "쉬는날", "연차유급휴가"],
+            category: "복무 규율",
+            title: "사원 복무 규율 및 준수사항",
+            keywords: ["복무", "규율", "이중취업", "겸직", "졸음운전", "횡령", "친절"],
             isDanger: false,
-            summary: "1년간 80% 이상 출근 시 15일의 연차유급휴가가 부여되며, 5일 전 서면 신청이 필요합니다.",
+            summary: "사원은 회사의 직장 질서 유지와 안전운전을 위해 17가지 복무 규율을 성실히 준수해야 합니다.",
             rules: [
-                { title: "제20조 제1항", content: "1년간 80퍼센트 이상 출근한 사원에게 15일의 연차유급휴가 부여" },
-                { title: "제20조 제2항", content: "1년 미만 근로자 또는 80% 미만 출근자는 1개월 개근 시 1일 부여" },
-                { title: "제20조 제3항", content: "연차 유급 휴가는 사용 5일 전 서면으로 신청하여 회사 승인 수령" }
+                { title: "제7조 (복무규율 주요 내용)", content: "• 회사의 승인 없는 타 회사 이중취업(겸직) 금지<br>• 음주, 숙취, 약물 복용 및 졸음 상태에서의 운전 금지<br>• 승객에 대한 불친절, 요금 임의 포탈 및 공금 횡령 금지<br>• 회사 시설물 및 운행 차량의 정당한 보전 관리 의무" }
+            ]
+        },
+        {
+            category: "근무시간",
+            title: "직종별 근무시간 및 근무제도",
+            keywords: ["근무시간", "운전직", "정비직", "배차직", "교대", "격일제", "탄력적"],
+            isDanger: false,
+            summary: "기본 주 40시간(최대 52시간) 기준이며, 직종 특성에 따라 2교대, 격일제, 탄력근로제가 적용됩니다.",
+            rules: [
+                { title: "제14조 제1항 (기본 근로시간)", content: "휴게시간 제외 1일 8시간, 주 40시간을 원칙으로 하며 주 52시간 한도 내 유연근로 가능" },
+                { title: "운전직 사원", content: "1일 2교대(월 22일 근무)를 원칙으로 하며, 노사 합의 시 격일제(월 12일) 시행" },
+                { title: "정비직 사원", content: "월 26일 주간 근무제 (당직 6일 포함)" },
+                { title: "배차직 사원", content: "2주 단위 탄력적 근로시간제 시행" },
+                { title: "관리직 등 일반사원", content: "주 50시간 범위 내 09:00~18:00 주간 근무" }
+            ]
+        },
+        {
+            category: "휴가 & 휴일",
+            title: "연차 유급 휴가 발생 및 사용 기준",
+            keywords: ["연차", "휴가", "월차", "쉬는날", "유급휴가", "연차신청"],
+            isDanger: false,
+            summary: "1년 80% 이상 출근 시 15일의 연차가 부여되며, 최소 5일 전 서면 신청이 필요합니다.",
+            rules: [
+                { title: "제20조 제1항 (1년 이상 근무자)", content: "1년간 80퍼센트 이상 출근 시 15일의 유급휴가 부여 (근속년수에 따라 가산)" },
+                { title: "제20조 제2항 (1년 미만 근무자)", content: "1개월 개근 시 1일의 유급휴가 부여" },
+                { title: "제20조 제3항 (휴가 신청)", content: "연차 유급 휴가는 사용 5일 전에 서면으로 신청하여 회사의 승인을 얻어야 함" }
+            ]
+        },
+        {
+            category: "모성보호 & 돌봄",
+            title: "육아휴직, 산전후휴가 및 가족돌봄",
+            keywords: ["육아", "육아휴직", "산전후휴가", "출산", "임신", "돌봄", "가족돌봄", "육아기"],
+            isDanger: false,
+            summary: "출산 및 육아, 가족 돌봄을 위해 산전후휴가, 육아휴직(최대 1년), 육아기 근로시간 단축을 신청할 수 있습니다.",
+            rules: [
+                { title: "제25조 (산전후휴가)", content: "임신 중인 여성 사원에게 출산 전후를 통하여 90일(다태아 120일)의 출산전후휴가 부여" },
+                { title: "제28조 (육아휴직)", content: "만 8세 이하 또는 초등학교 2학년 이하 자녀 양육을 위해 최대 1년 이내의 육아휴직 신청 가능" },
+                { title: "제29조 (육아기 근로시간 단축)", content: "육아휴직 대신 주당 15~35시간으로 근로시간 단축 신청 가능" },
+                { title: "제31조 (가족돌봄휴가)", content: "가족의 질병, 사고, 노령, 자녀 양육을 위해 연간 최대 10일의 무급 휴가 사용 가능" }
             ]
         },
         {
             category: "복리후생",
-            title: "경조휴가 지급 기준",
-            keywords: ["경조사", "결혼", "사망", "장례", "경조휴가", "화환"],
+            title: "경조휴가 지급 수일 및 대상",
+            keywords: ["경조사", "결혼", "사망", "장례", "경조휴가", "화환", "조부모"],
             isDanger: false,
-            summary: "본인 및 가족의 경조사 발생 시 유형별 유급 휴가가 부여됩니다.",
+            summary: "본인 및 친족의 경조사 발생 시 증빙서류 제출과 함께 경조휴가가 지급됩니다.",
             rules: [
-                { title: "본인 결혼", content: "5일 유급휴가" },
-                { title: "자녀 결혼", content: "1일 유급휴가" },
-                { title: "부모 / 배우자 / 자녀 사망", content: "5일 유급휴가" },
-                { title: "조부모 사망", content: "2일 중 1일 유급휴가" }
+                { title: "제32조 경조휴가 세부 기준", content: "• 본인 결혼: 5일 유급<br>• 자녀 결혼: 1일 유급<br>• 부모 / 배우자 / 배우자 부모 / 자녀 사망: 5일 유급<br>• 조부모 / 외조부모 사망: 2일 중 1일 유급" }
             ]
         },
         {
-            category: "퇴직 & 정년",
-            title: "직종별 정년퇴직 기준",
-            keywords: ["정년", "퇴직", "나이", "촉탁", "임시직"],
+            category: "퇴직 & 해고",
+            title: "정년퇴직 기준 및 해고예고 절차",
+            keywords: ["정년", "퇴직", "나이", "해고", "해고예고", "촉탁", "임시직", "퇴직금"],
             isDanger: false,
-            summary: "운전직·정비직은 만 65세, 기타 사원은 만 60세가 정년입니다.",
+            summary: "운전·정비직 정년은 만 65세이며, 해고 시에는 최소 30일 전 예고하거나 30일분의 통상임금을 지급해야 합니다.",
             rules: [
-                { title: "제38조 제1항", content: "운전직·정비직 사원 정년: 만 65세" },
-                { title: "제38조 제2항", content: "그 밖의 사원(관리직 등) 정년: 만 60세" },
-                { title: "제38조 제3항", content: "정년에 달한 월의 말일 퇴직. 필요시 촉탁사원 재고용 가능" }
+                { title: "제38조 (정년퇴직 기준)", content: "• 운전직 · 정비직 사원: 만 65세<br>• 그 밖의 사원(관리직 등): 만 60세<br>※ 정년에 달한 월의 말일 퇴직하며, 회사 필요시 촉탁사원으로 재고용 가능" },
+                { title: "제36조 (해고예고 규정)", content: "사원을 해고하고자 할 때에는 적어도 30일 전에 예고를 하여야 하며, 30일 전에 예고하지 아니하였을 때에는 30일분의 통상임금을 지급해야 함" }
+            ]
+        },
+        {
+            category: "🚨 복무 & 징계",
+            title: "음주운전 및 측정 거부 처벌 기준",
+            keywords: ["음주", "술", "숙취", "측정", "음주운전", "음주측정", "징계해고"],
+            isDanger: true,
+            summary: "숙취 운전을 포함하여 음주 측정 거부 시 즉시 징계해고 대상이 되는 엄격한 무관용 원칙이 적용됩니다.",
+            rules: [
+                { title: "제7조 제13호", content: "음주 및 숙취 상태 운전 절대 금지 및 측정 응시 의무" },
+                { title: "제51조 (감봉 사유)", content: "음주측정 수치 0.03% 미만 또는 1회 적발 시" },
+                { title: "제52조 (승무정지 사유)", content: "음주측정 수치 0.03% 이상 ~ 0.08% 미만 또는 2회 적발 시" },
+                { title: "제53조 (징계해고 사유)", content: "수치 0.08% 이상, 3회 적발, 또는 회사의 음주측정을 거부한 경우 즉시 징계해고" }
             ]
         }
     ];
 
-    // 2. 검색 및 안전 처리 로직 (API 에러 방지)
     function handleSearch() {
         const inputEl = document.getElementById('user-input');
         const query = inputEl.value.trim().toLowerCase();
@@ -138,40 +193,34 @@
             return;
         }
 
-        // 로딩 및 상태 표시 (에러 발생 가능성 차단)
         statusEl.style.display = 'block';
         statusEl.innerText = '취업규칙 데이터를 조회 중입니다...';
 
-        try {
-            // 키워드 검색 수행
+        setTimeout(() => {
+            statusEl.style.display = 'none';
             const results = knowledgeBase.filter(item => {
                 return item.title.toLowerCase().includes(query) ||
                        item.summary.toLowerCase().includes(query) ||
-                       item.keywords.some(kw => kw.toLowerCase().includes(query));
+                       item.keywords.some(kw => kw.toLowerCase().includes(query)) ||
+                       item.rules.some(r => r.title.toLowerCase().includes(query) || r.content.toLowerCase().includes(query));
             });
-
-            setTimeout(() => { // 처리감을 주기 위한 미세 지연
-                statusEl.style.display = 'none';
-                renderCards(results, container);
-            }, 200);
-
-        } catch (error) {
-            // 외부 API 통신 실패 시에도 앱이 튕기지 않도록 예외 처리
-            console.error('검색 중 오류 발생:', error);
-            statusEl.style.color = 'var(--danger)';
-            statusEl.innerText = '데이터를 불러오는 중 오류가 발생했습니다. 다시 시도해 주세요.';
-        }
+            renderCards(results, container);
+        }, 150);
     }
 
-    // 3. 카드뷰 UI 렌더링 함수
+    function quickSearch(keyword) {
+        document.getElementById('user-input').value = keyword;
+        handleSearch();
+    }
+
     function renderCards(dataList, container) {
         container.innerHTML = '';
 
         if (dataList.length === 0) {
             container.innerHTML = `
                 <div class="no-result">
-                    🔍 입력하신 단어에 해당하는 취업규칙 항목을 찾을 수 없습니다.<br>
-                    <strong>'음주', '연차', '경조사', '정년'</strong> 등의 키워드로 검색해 보세요.
+                    🔍 입력하신 단어와 일치하는 취업규칙 항목을 찾을 수 없습니다.<br>
+                    하단의 추천 태그(음주운전, 연차, 육아휴직 등)를 클릭해 보세요.
                 </div>
             `;
             return;
@@ -183,7 +232,7 @@
 
             const rulesHtml = item.rules.map(r => `
                 <div class="rule-item">
-                    <strong>📌 ${r.title}</strong>
+                    <strong>🔹 ${r.title}</strong>
                     ${r.content}
                 </div>
             `).join('');
@@ -204,9 +253,7 @@
         });
     }
 
-    // 초기 화면 실행
     window.onload = function() {
-        // 기본값으로 전체 규칙 안내 표시
         renderCards(knowledgeBase, document.getElementById('result-container'));
     };
 </script>
