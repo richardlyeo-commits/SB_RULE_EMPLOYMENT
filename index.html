@@ -69,13 +69,13 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px}
 <!-- autocomplete="off": 이전에 쳤던 글자가 자동으로 뜨지 않게 함 -->
 <!-- spellcheck="false": 한글에 빨간 밑줄이 생기지 않게 함 -->
 <!-- placeholder      : 칸이 비어 있을 때 보이는 안내 글자 -->
-<input
+
   lang="ko"
   autocomplete="off"
   spellcheck="false"
   placeholder="한글로 검색 (영어면 한/영 키를 눌러 주세요)"
   ... (원래 있던 내용은 그대로 두세요) ...
-> id="q" type="search" placeholder="단어 또는 조항 번호 (예: 음주, 제51조)" autocomplete="off">
+<input id="q" type="search" placeholder="단어 또는 조항 번호 (예: 음주, 제51조)" autocomplete="off">
     <button onclick="clearAll()">지우기</button>
   </div>
   <div class="hint">단어를 띄어 쓰면 <b>모두 들어간</b> 조항만 찾습니다 (예: 음주 해고). 숫자만 쓰면 조항 번호로 찾습니다.</div>
