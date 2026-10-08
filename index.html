@@ -63,18 +63,18 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px}
     <div class="size"><button onclick="changeSize(-1)" aria-label="글자 작게">가-</button><button onclick="changeSize(1)" aria-label="글자 크게">가+</button></div>
   </div>
   <p class="notice">📄 취업규칙 PDF 전문을 옮긴 화면입니다. 임금·퇴직금 등은 <b>단체협약·임금협정</b>에 따로 정해져 있습니다(제39·40조). 징계·해고 판단은 반드시 <b>원본 PDF</b>로 최종 확인하세요.</p>
-  <div class="search">
-    <!-- 버전: 20261004-01 -->
-<!-- lang="ko"        : "이 칸은 한국어로 입력하는 곳"이라고 기기에 알려 줌 (한글 키보드로 열릴 확률이 높아짐) -->
-<!-- autocomplete="off": 이전에 쳤던 글자가 자동으로 뜨지 않게 함 -->
-<!-- spellcheck="false": 한글에 빨간 밑줄이 생기지 않게 함 -->
-<!-- placeholder      : 칸이 비어 있을 때 보이는 안내 글자 -->
+  
+    <div class="search">
+    <!-- 버전: 20261004-03 (검색창 속성을 input 안에 올바르게 넣음) -->
+    <!-- lang="ko"         : 이 칸은 한국어 입력용이라고 기기에 알려 줌 -->
+    <!-- autocomplete="off": 이전에 쳤던 글자가 자동으로 뜨지 않게 함 -->
+    <!-- spellcheck="false": 한글에 빨간 밑줄이 생기지 않게 함 -->
+    <input id="q" type="search" lang="ko" autocomplete="off" spellcheck="false"
+           placeholder="단어 또는 조항 번호 (예: 음주, 제51조)">
+    <button onclick="clearAll()">지우기</button>
+  </div>
 
-  lang="ko"
-  autocomplete="off"
-  spellcheck="false"
-  placeholder="한글로 검색 (영어면 한/영 키를 눌러 주세요)"
-  ... (원래 있던 내용은 그대로 두세요) ...
+
 <input id="q" type="search" placeholder="단어 또는 조항 번호 (예: 음주, 제51조)" autocomplete="off">
     <button onclick="clearAll()">지우기</button>
   </div>
